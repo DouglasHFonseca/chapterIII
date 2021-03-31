@@ -1,8 +1,8 @@
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, Repository } from "typeorm";
 
-import { IFindUserWithGamesDTO, IFindUserByFullNameDTO } from '../../dtos';
-import { User } from '../../entities/User';
-import { IUsersRepository } from '../IUsersRepository';
+import { IFindUserWithGamesDTO, IFindUserByFullNameDTO } from "../../dtos";
+import { User } from "../../entities/User";
+import { IUsersRepository } from "../IUsersRepository";
 
 export class UsersRepository implements IUsersRepository {
   private repository: Repository<User>;
