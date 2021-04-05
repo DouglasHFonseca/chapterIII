@@ -1,5 +1,6 @@
 import { getRepository, Repository } from "typeorm";
 
+import { Game } from "../../../games/entities/Game";
 import {
   IFindUserWithGamesDTO,
   IFindUserByFullNameDTO,
@@ -32,8 +33,11 @@ export class UsersRepository implements IUsersRepository {
   async findUserWithGamesById({
     user_id,
   }: IFindUserWithGamesDTO): Promise<User> {
-    throw new Error("Method not implemented.");
-    // Complete usando ORM
+    const user = await this.repository.findOne(user_id, {
+      relations: ["games"],
+    });
+
+    return user;
   }
 
   async findAllUsersOrderedByFirstName(): Promise<User[]> {
@@ -45,8 +49,28 @@ export class UsersRepository implements IUsersRepository {
     last_name,
   }: IFindUserByFullNameDTO): Promise<User[] | undefined> {
     return this.repository.query(
-      `SELECT * FROM USERS WHERE first_name=$1 and first_name=$2`,
+      `SELECT * FROM USERS WHERE LOWER(first_name)=LOWER($1) and LOWER(last_name)=LOWER($2)`,
       [first_name, last_name]
     ); // Complete usando raw query
+  }
+
+  async addGameToUser(user: User, game: Game): Promise<void> {
+    this.repository
+      .createQueryBuilder()
+      .relation(User, "games")
+      .of(user)
+      .add(game);
+  }
+
+  async verifyGame(user: User, game: Game): Promise<Game> {
+    const validGame = await this.repository
+      .createQueryBuilder("users")
+      .leftJoinAndSelect("users.games", "games")
+      .where("users.id=:id", { id: user.id })
+      .getOneOrFail();
+
+    const findGame = validGame.games.find((gameID) => gameID.id === game.id);
+
+    return findGame;
   }
 }

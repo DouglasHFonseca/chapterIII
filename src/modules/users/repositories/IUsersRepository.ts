@@ -1,3 +1,4 @@
+import { Game } from "../../games/entities/Game";
 import {
   IFindUserWithGamesDTO,
   IFindUserByFullNameDTO,
@@ -6,7 +7,9 @@ import {
 import { User } from "../entities/User";
 
 export interface IUsersRepository {
+  verifyGame(user: User, game: Game): Promise<Game>;
   create(data: ICreateUserDTO): Promise<void>;
+  addGameToUser(user: User, game: Game): Promise<void>;
   findByEmail(email: string): Promise<User>;
   findUserWithGamesById(data: IFindUserWithGamesDTO): Promise<User>;
   findAllUsersOrderedByFirstName(): Promise<User[]>;
